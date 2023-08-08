@@ -18,12 +18,12 @@ LLAMA_Y_POS_REF = 200
 LLAMA_X_POS = 20
 
 #sets the time between object spawns in seconds
-OBJECT_SPAWN_INTERVAL = 5
+OBJECT_SPAWN_INTERVAL = 2
 
 #how long a jump takes in seconds
 llama_jump_period = 2
 #how high a jump goes in pixels
-llama_jump_height = 20
+llama_jump_height = 40
 
 #how long a duck takes in seconds
 llama_duck_period = 2
@@ -40,7 +40,7 @@ FOOD_BLUE = (127,202,255)
 #pls leave alone
 
 #creates a list which will be used to store what objects are on screen
-global object_list
+object_list = []
 
 
 #takes the time of when the program started to be used for score
@@ -61,45 +61,45 @@ quit_game = True
 #used to set the time intervals for object spawning
 object_counter = 1
 
-#______________ Objects and functions __________________________________________________________________
+#______________ Dictonarys and functions __________________________________________________________________
 
 
-#defines the object class which is used to store info and update the objects which go across the screen
-class objects:
-    #defines the inital varables for the object
-    def __inti__(self):
-        self.speed = 1
-        self.x_pos = 400
-        self.image_name = "test.png"
-        self.image_width = 20
-        self.image_height = 20
+object_list = []
 
-    def dict(self):
-        speed_dict = self.speed
-        x_pos = self.x_pos
-        image_name = self.image_name
-        image_width = self.image_width
-        image_height = self.image_height
-    
-        
+
 
 #This function is called every frame to update the obsticales being displayed
-def  object_update(object_counter):
-    global object_list, k
+def  object_update():
+    global object_list , object_counter
+
+    #print("time.time() - time_since_start {}".format(time.time() - time_since_start))
+    #print("OBJECT_SPAWN_INTERVAL*object_counter{}".format(OBJECT_SPAWN_INTERVAL*object_counter))
+
     if time.time() - time_since_start > OBJECT_SPAWN_INTERVAL*object_counter:
         print("if loop started")
-        #object_list.append(objects)
+
+        #x_pos , speed , image name , image width, image height
+        object_list.append([400,1,"test_name.png",20,20])
         object_counter += 1
+        print(object_list)
+        print("number of objects counter: {}".format(object_counter))
+        print("number of objects on object list: {}".format(len(object_list)))
     
-    #print("number of objects :{}".format(len(object_list)))
-    
-  
-    return(object_counter)
+    #removes objects from the list if they are off the screen
+    if len(object_list) > 0 and object_list[0][0] < 0:
+        object_list.pop(0)
 
-
-def object_draw(object_list):
+    #updates the objects x positon based on their speed
     for things in object_list:
-        pygame.draw.rect(screen,SNAKE_RED,[things.x_pos,LLAMA_Y_POS_REF +20,20,20])
+        things[0] -= things[1]
+
+
+
+
+def object_draw():
+    global object_list
+    for things in object_list:
+        pygame.draw.rect(screen,SNAKE_RED,[things[0],LLAMA_Y_POS_REF +40,20,20])
         
 def user_input():
     llama_jump = False
@@ -124,7 +124,8 @@ def user_input():
 #This function takes two boolen values of weither the user wants to jump or duck. It then checks if they are already
 #jumping and if they are not then initating a jump of height or duck of depth and lenth of time determined by the varables 
 #at the top of the program 
-def llama_draw(currently_jumping,time_jump_started,currently_ducking,time_duck_started):
+def llama_draw():
+    global currently_jumping,time_jump_started,currently_ducking,time_duck_started
     #sets the lammas positon as the refrance positon
     llama_y_pos = LLAMA_Y_POS_REF
 
@@ -170,7 +171,7 @@ def llama_draw(currently_jumping,time_jump_started,currently_ducking,time_duck_s
 
     pygame.draw.rect(screen,SNAKE_RED,[20,llama_y_pos,20,20])
 
-    return(currently_jumping,time_jump_started,currently_ducking,time_duck_started)
+    return()
 
 
 
@@ -182,35 +183,28 @@ def llama_draw(currently_jumping,time_jump_started,currently_ducking,time_duck_s
 #Creates the screen object with the aformentioned screen height and width and makes it resizable
 screen = pygame.display.set_mode((INITAL_SCREEN_WIDTH,INITAL_SCREEN_HEIGHT), pygame.RESIZABLE)
 
-
-object_list = [objects,objects]
-
-k = 0
-
-
 while quit_game:
 
-   # if object_list[0].dict.x_pos < 0:
-    #   print("item deleted")
-     #  object_list.pop([0])
+
 
 
     #checks for user inputs
     llama_jump,llama_duck,quit_game = user_input()
     
-    #object_counter = object_update(object_counter)
+    object_update()
 
     
     screen.fill(LIGHT_BACROUND)
 
-    #object_list = object_draw(object_list)
-    #usses the user inputs to smoothly move the llama through a jump or duck
-    #this function usses latching if statments and relative time hence the nesscity to pass so many varables
-    currently_jumping,time_jump_started,currently_ducking,time_duck_started = llama_draw(currently_jumping,time_jump_started,currently_ducking,time_duck_started)
-    
-
     pygame.draw.rect(screen,FOOD_BLUE,[0,LLAMA_Y_POS_REF+20,400,20])
 
-    2
+    object_draw()
+    #usses the user inputs to smoothly move the llama through a jump or duck
+
+    #this function takes the user input and moves the lama 
+    llama_draw()
+    
+
+    
 
     pygame.display.update()
