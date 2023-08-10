@@ -6,6 +6,8 @@
 import pygame
 import time
 
+pygame.font.init()
+
 #______________ Changable Global Varables and Constants __________________________________________________________________
 
 #-----llama varables------------------------------------------------
@@ -72,6 +74,9 @@ quit_game = True
 #used to set the time intervals for object spawning
 obsticale_counter = 1
 
+#defines the font for the messages 
+font = pygame.font.Font("FreeSansBold.ttf", 30)
+
 
 #______________ Functions __________________________________________________________________
 #This function is called every tick to check for user input and then raise the apporpate flags
@@ -109,7 +114,6 @@ def  object_update():
         #x_pos , speed , time object spawned, image name , image width, image height
         obsticale_list.append([400,200,time.time(),"test_name.png",20,20])
         obsticale_counter += 1
-        print(obsticale_list)
 
     
     #removes obsticales from the list if they are off the screen
@@ -118,7 +122,7 @@ def  object_update():
 
     for things in obsticale_list:
         #updates the obsticales x positon based on their speed
-        things[0] = INITAL_SCREEN_WIDTH - (things[1]*(time.time()-things[2]))
+        things[0] = INITAL_SCREEN_WIDTH - (time.time() - time_since_start)*0.1* (things[1]*(time.time()-things[2]))
 
     
       
@@ -187,6 +191,13 @@ def textrue(x_pos,y_pos,local_image_width,local_image_height,local_image_name):
     #places the texture over the rectangle
     screen.blit(resized_texture, location)
 
+#THis function takes a message 
+def message(msg,text_colour, bkgd_colour, x_pos, Y_pos):
+    txt = font.render(msg, True, text_colour, bkgd_colour)
+    text_box = txt.get_rect(center = (x_pos,Y_pos ))
+    screen.blit(txt, text_box)
+
+
 #This function draws all the things dispalyed on the screen 
 def draw(llama_y_pos):
     global obsticale_list
@@ -200,6 +211,11 @@ def draw(llama_y_pos):
     #draws the sun circle
     pygame.draw.circle(screen,SUN_ORANGE,[200,100],50)
 
+
+    
+    #draws the time/high score
+    message("{:.0f}".format(time.time() - time_since_start),FLOOR_GREY,BACROUND_YELLOW,20,20)
+
     #draws the llamma with its texture
     textrue(LLAMA_X_POS,llama_y_pos,LLAMA_WIDTH,LLAMA_HEIGHT,"Llama3.png")
 
@@ -212,7 +228,7 @@ def draw(llama_y_pos):
 
 
 #______________ Main Loop __________________________________________________________________
-    
+
 #Creates the screen object with the aformentioned screen height and width and makes it resizable
 screen = pygame.display.set_mode((INITAL_SCREEN_WIDTH,INITAL_SCREEN_HEIGHT), pygame.RESIZABLE)
 
@@ -229,10 +245,7 @@ while quit_game:
     #print(llama_y_pos)
     draw(llama_y_pos)
 
-    #if(len(obsticale_list) > 0):
-       #print()
-    
-    print(Y_POS_REF-llama_y_pos-LLAMA_HEIGHT > OBSTICAL_HEIGHT)
+    #kills the llama if the obstical is in contact 
     if(Y_POS_REF-llama_y_pos-LLAMA_HEIGHT < OBSTICAL_HEIGHT and len(obsticale_list) > 0 and obsticale_list[0][0] > 19 and obsticale_list[0][0] < 31):
         quit_game = False
     
